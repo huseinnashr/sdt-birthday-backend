@@ -1,0 +1,48 @@
+version: '3.2'
+services:
+  birthday-backend-http:
+    container_name: birthday-backend-http
+    build:
+      context: ./
+      dockerfile: ./.dev/birthday-backend.dockerfile
+    environment:
+      - "NODE_ENV=development"
+    command: [ "npm", "run", "dev:http" ]
+    ports:
+      - 3000:3000
+    volumes:
+      - ./src:/app/src
+    depends_on:
+      - birthday-backend-cron
+  birthday-backend-cron:
+    container_name: birthday-backend-cron
+    build:
+      context: ./
+      dockerfile: ./.dev/birthday-backend.dockerfile
+    environment:
+      - "NODE_ENV=development"
+    command: [ "npm", "run", "dev:cron" ]
+    ports:
+      - 3001:3000
+    volumes:
+      - ./src:/app/src
+    depends_on:
+      - birthday-redis
+      - birthday-postgres
+  birthday-postgres:
+    container_name: birthday-postgres
+    image: postgres:12.0-alpine
+    environment:
+      POSTGRES_DB: birthday
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      PGDATA: /var/lib/postgresql/data/birthday
+    volumes:
+      - ./.dev/birthday-postgres/data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+  birthday-redis:
+    container_name: birthday-redis
+    image: redis:latest
+    ports:
+      - "6379:6379"
