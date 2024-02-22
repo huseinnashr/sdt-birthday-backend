@@ -1,12 +1,12 @@
 import { CreateUserRequest, UpdateUserRequest } from "../../handler/http/user/user.http.entity.js";
 import { AppError } from "../../pkg/apperror/apperror.pkg.js";
 import { PromiseSafe, PromiseSafeVoid } from "../../pkg/safecatch/safecatch.type.js";
-import { UserRepository } from "../../repo/user/user.repo.js";
 import { Config } from "../../config/config.entity.js";
 import { Logger } from "../../pkg/logger/logger.pkg.js";
+import { IUserRepository } from "../../repo/user/user.repo.interface.js";
 
 export class UserUsecase {
-  constructor(private cfg: Config, private logger: Logger, private userRepo: UserRepository) { }
+  constructor(private cfg: Config, private logger: Logger, private userRepo: IUserRepository) { }
 
   async createUser(req: CreateUserRequest): PromiseSafe<number> {
     const userId = await this.userRepo.create(req)
@@ -18,7 +18,7 @@ export class UserUsecase {
   }
 
   async updateUser(req: UpdateUserRequest): PromiseSafeVoid {
-    const resGet = this.userRepo.get(req.userId)
+    const resGet = await this.userRepo.get(req.userId)
     if (resGet instanceof AppError) {
       return new AppError("Failed to get user", resGet)
     }

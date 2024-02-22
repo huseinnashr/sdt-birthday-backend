@@ -3,11 +3,11 @@ import { Nullable, PromiseSafe, PromiseSafeVoid } from '../../pkg/safecatch/safe
 import { QueryBuilder } from '../../pkg/querybuilder/querybuilder.pkg.js';
 import { PoolClient, QueryRunner } from '../../pkg/poolclient/poolclient.pkg.js';
 import { CreateUserRequest, UpdateUserRequest } from '../../handler/http/user/user.http.entity.js';
-import { UserEntity } from '../../domain/user.domain.js';
-import { CreateUserRes, SendEmailReq, SendEmailRes } from './user.entity.js';
+import { CreateUserRes, SendEmailReq, SendEmailRes, UserEntity } from './user.repo.entity.js';
 import { HttpClient } from '../../pkg/httpclient/httpclient.pkg.js';
+import { IUserRepository } from './user.repo.interface.js';
 
-export class UserRepository {
+export class UserRepository implements IUserRepository{
   constructor(private queryRunner: QueryRunner, private httpClient: HttpClient) { }
 
 

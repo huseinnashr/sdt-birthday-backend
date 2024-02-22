@@ -26,4 +26,4 @@ async function main() {
   server.listen(3000, (): void => console.log(`running on port 3000`))
 }
 
-await main()
+main()
