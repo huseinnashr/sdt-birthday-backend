@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS public.users (
     first_name varchar NOT NULL,
     last_name varchar NOT NULL,
     birthday date NOT NULL,
-	gmt_offset smallint NOT NULL,
+	gmt_offset float NOT NULL,
 	last_run timestamp,
 	last_send timestamp,
 	CONSTRAINT users_pk PRIMARY KEY (id)

@@ -7,12 +7,12 @@ export class UserHandler {
   constructor(private userUc: UserUsecase) { }
 
   async createUser(req: CreateUserRequest): PromiseSafe<CreateUserResponse> {
-    const balance = await this.userUc.createUser(req)
-    if (balance instanceof AppError) {
-      return HttpError.toHttpError(balance)
+    const resCreate = await this.userUc.createUser(req)
+    if (resCreate instanceof AppError) {
+      return HttpError.toHttpError(resCreate)
     }
 
-    return { userId: 0 }
+    return { userId: resCreate }
   }
 
   async updateUser(req: UpdateUserRequest): PromiseSafe<UpdateUserResponse> {

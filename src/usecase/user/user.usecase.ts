@@ -36,6 +36,15 @@ export class UserUsecase {
   }
 
   async deleteUser(userId: number): PromiseSafeVoid {
+    const resGet = await this.userRepo.get(userId)
+    if (resGet instanceof AppError) {
+      return new AppError("Failed to get user", resGet)
+    }
+
+    if (resGet == null) {
+      return new AppError("User is not found or already deleted")
+    }
+
     const res = await this.userRepo.delete(userId)
     if (res instanceof AppError) {
       return new AppError("Failed to create new user", res)

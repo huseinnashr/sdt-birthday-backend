@@ -35,8 +35,8 @@ export class UserRepository implements IUserRepository{
 
   async _create(req: CreateUserRequest, conn: PoolClient): PromiseSafe<number> {
     const qb = new QueryBuilder(
-      `INSERT INTO "users"(first_name, last_name, birthday, timezone) VALUES (?, ?, ?) RETURNING id`,
-      req.firstName, req.lastName, req.birthday, req.timezone,
+      `INSERT INTO "users"(first_name, last_name, birthday, gmt_offset) VALUES (?, ?, ?, ?) RETURNING id`,
+      req.firstName, req.lastName, req.birthday, req.gmtOffset,
     )
 
     const user = await conn.execRowOrFailed(qb, CreateUserRes)
@@ -54,8 +54,8 @@ export class UserRepository implements IUserRepository{
 
   async _update(req: UpdateUserRequest, conn: PoolClient): PromiseSafeVoid {
     const qb = new QueryBuilder(
-      `UPDATE "users" SET first_name = ?, last_name = ?, birthday = ?, timezone = ? WHERE id = ?`,
-      req.firstName, req.lastName, req.birthday, req.timezone, req.userId,
+      `UPDATE "users" SET first_name = ?, last_name = ?, birthday = ?, gmt_offset = ? WHERE id = ?`,
+      req.firstName, req.lastName, req.birthday, req.gmtOffset, req.userId,
     )
 
     const res = await conn.exec(qb)

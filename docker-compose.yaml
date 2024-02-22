@@ -27,7 +27,6 @@ services:
     volumes:
       - ./src:/app/src
     depends_on:
-      - birthday-redis
       - birthday-postgres
   birthday-postgres:
     container_name: birthday-postgres
@@ -41,8 +40,3 @@ services:
       - ./.dev/birthday-postgres/data:/var/lib/postgresql/data
     ports:
       - '5432:5432'
-  birthday-redis:
-    container_name: birthday-redis
-    image: redis:latest
-    ports:
-      - "6379:6379"

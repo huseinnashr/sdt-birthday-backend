@@ -1,4 +1,5 @@
-import { IsDate, IsNotEmpty, Min } from "class-validator"
+import { Transform } from "class-transformer"
+import { IsDateString, IsNotEmpty, Min } from "class-validator"
 
 export class CreateUserRequest {
   @IsNotEmpty()
@@ -8,11 +9,11 @@ export class CreateUserRequest {
   lastName: string = ""
 
   @IsNotEmpty()
-  @IsDate()
+  @IsDateString()
   birthday: string = ""
 
   @IsNotEmpty()
-  timezone: string = ""
+  gmtOffset: number = 0
 }
 
 export type CreateUserResponse = {
@@ -20,6 +21,7 @@ export type CreateUserResponse = {
 }
 
 export class UpdateUserRequest {
+  @Transform(param => parseInt(param.value, 10), { toClassOnly: true })
   @Min(1)
   userId: number = 0
 
@@ -30,11 +32,11 @@ export class UpdateUserRequest {
   lastName: string = ""
 
   @IsNotEmpty()
-  @IsDate()
+  @IsDateString()
   birthday: string = ""
 
   @IsNotEmpty()
-  timezone: string = ""
+  gmtOffset: number = 0
 }
 
 export type UpdateUserResponse = {
@@ -42,6 +44,7 @@ export type UpdateUserResponse = {
 }
 
 export class DeleteUserRequest {
+  @Transform(param => parseInt(param.value, 10), { toClassOnly: true })
   @Min(1)
   userId: number = 0
 }

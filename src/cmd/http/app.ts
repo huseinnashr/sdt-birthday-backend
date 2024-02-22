@@ -29,9 +29,9 @@ export async function runApp(cfg: Config, appRoute: AppRoute, logger: Logger): P
   const emptyCtxCtrl = new EmptyContextController()
   const userHandler = new UserHandler(userUc)
 
-  appRoute.register("post", "/user", emptyCtxCtrl, CreateUserRequest, (_, body) => userHandler.createUser(body))
-  appRoute.register("put", "/user/:userId", emptyCtxCtrl, UpdateUserRequest, (_, body) => userHandler.updateUser(body))
-  appRoute.register("delete", "/user/:userId", emptyCtxCtrl, DeleteUserRequest, (_, body) => userHandler.deleteUser(body))
+  appRoute.register("post", "/users", emptyCtxCtrl, CreateUserRequest, (_, body) => userHandler.createUser(body))
+  appRoute.register("put", "/users/:userId", emptyCtxCtrl, UpdateUserRequest, (_, body) => userHandler.updateUser(body))
+  appRoute.register("delete", "/users/:userId", emptyCtxCtrl, DeleteUserRequest, (_, body) => userHandler.deleteUser(body))
 
   return null
 }
