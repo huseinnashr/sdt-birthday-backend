@@ -37,10 +37,7 @@ class JWTConfig {
 }
 
 class CronConfig {
-  finishItemCron: CronUCConfig = Obj.make(CronUCConfig, { batchSize: 10 })
-  pickWinnerCron: CronUCConfig = Obj.make(CronUCConfig, { batchSize: 10 })
-  refundCron: CronUCConfig = Obj.make(CronUCConfig, { batchSize: 10 })
-  transferCron: CronUCConfig = Obj.make(CronUCConfig, { batchSize: 10 })
+  sendBirthdayCron: CronUCConfig = Obj.make(CronUCConfig, { batchSize: 2 })
 }
 
 class CronUCConfig {

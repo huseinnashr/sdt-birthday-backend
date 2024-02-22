@@ -5,7 +5,7 @@ import "reflect-metadata"
 import { Logger } from "../../pkg/logger/logger.pkg.js";
 import { AppError } from "../../pkg/apperror/apperror.pkg.js";
 import { Config } from "../../config/config.entity.js";
-import { AppRoute } from "../../controller/http/route.http.js";
+import { AppRoute } from "../../handler/http/route.http.js";
 import cors from 'cors'
 
 async function main() {

@@ -6,7 +6,7 @@ import { FieldSource, HTTPFieldError, HTTPServerError, HttpError, PromiseSafe, P
 import { IsEmpty, validate } from "class-validator"
 import { Logger } from "../../pkg/logger/logger.pkg.js"
 
-export type HttpMethod = "get" | "post"
+export type HttpMethod = "get" | "post" | "delete" | "put"
 
 // TODO: seperate context source and data
 export abstract class HttpContextController<T> {
@@ -68,7 +68,7 @@ export class AppRoute {
       return initCtx
     }
 
-    const body = safeCatch(() => plainToInstance(cls, { ...req.query, ...req.body }))
+    const body = safeCatch(() => plainToInstance(cls, { ...req.query, ...req.params, ...req.body }))
     if (body instanceof AppError) {
       return HttpError.toHttpError(body)
     }

@@ -4,22 +4,18 @@ import { safeCatchPromise } from "../../pkg/safecatch/safecatch.pkg.js";
 import { AppError } from "../../pkg/apperror/apperror.pkg.js";
 import { Logger } from "../../pkg/logger/logger.pkg.js";
 import { Config } from "../../config/config.entity.js";
-import { ItemRepository } from "../../repo/item/item.repo.js";
-import { ItemUsecase } from "../../usecase/item/item.usecase.js";
-import { ItemController } from "../../controller/cron/item/item.cron.controller.js";
+import { UserHandler } from "../../handler/cron/user/user.cron.controller.js";
 import cron from 'node-cron'
 import { Obj } from "../../pkg/objectfactory/objectfactory.pkg.js";
-import { BidUsecase } from "../../usecase/bid/bid.usecase.js";
+import { UserUsecase } from "../../usecase/user/user.usecase.js";
 import { UserRepository } from "../../repo/user/user.repo.js";
 import redis, { RedisClientType } from 'redis'
-import { RedisWrapper } from "../../pkg/rediswrapper/rediswrapper.pkg.js";
-import { BidRepository } from "../../repo/bid/bid.repo.js";
-import { BidController } from "../../controller/cron/bid/bid.cron.controller.js";
 import { QueryRunner } from "../../pkg/poolclient/poolclient.pkg.js";
+import { HttpClient } from "../../pkg/httpclient/httpclient.pkg.js";
 
 export async function runApp(cfg: Config, logger: Logger): PromiseSafeVoid {
-  const auctionDB = new pg.Pool({ connectionString: cfg.birthdayDB.connectionString, min: 10, max: 20 })
-  const auctionDBErr = await safeCatchPromise(() => auctionDB.connect())
+  const birthdayDB = new pg.Pool({ connectionString: cfg.birthdayDB.connectionString, min: 10, max: 20 })
+  const auctionDBErr = await safeCatchPromise(() => birthdayDB.connect())
   if (auctionDBErr instanceof AppError) {
     return new AppError("failed to connect auction DB", auctionDBErr)
   }
@@ -30,24 +26,17 @@ export async function runApp(cfg: Config, logger: Logger): PromiseSafeVoid {
     return new AppError("failed to initialized auction redis", auctionRedisErr)
   }
 
-  const queryRunner = new QueryRunner(logger, auctionDB)
-  const auctionRedisWrapper = new RedisWrapper(auctionRedis)
+  const queryRunner = new QueryRunner(logger, birthdayDB)
+  const emailServiceClient = new HttpClient("https://email-service.digitalenvision.com.au")
 
-  const userRepo = new UserRepository(auctionDB, auctionRedisWrapper)
-  const itemRepo = new ItemRepository(queryRunner)
-  const bidRepo = new BidRepository(queryRunner, auctionRedisWrapper)
+  const userRepo = new UserRepository(queryRunner, emailServiceClient)
 
-  const itemUc = new ItemUsecase(cfg, itemRepo)
-  const bidUc = new BidUsecase(cfg, queryRunner, itemRepo, userRepo, bidRepo)
+  const itemUc = new UserUsecase(cfg, logger, userRepo)
 
-  const itemCtrl = new ItemController(itemUc)
-  const bidCtrl = new BidController(bidUc)
+  const userHandler = new UserHandler(itemUc)
 
   const appCron = new AppCron(logger)
-  appCron.register("*/3 * * * * *", async () => itemCtrl.completingItem(), Obj.make(CronConfig, { name: "expiring_item", singleton: true }))
-  appCron.register("*/3 * * * * *", async () => itemCtrl.pickWinner(), Obj.make(CronConfig, { name: "pick_winner", singleton: true, msOffset: 250 }))
-  appCron.register("*/3 * * * * *", async () => bidCtrl.refundParticipant(), Obj.make(CronConfig, { name: "refund_participant", singleton: true, msOffset: 500 }))
-  appCron.register("*/3 * * * * *", async () => bidCtrl.payCreator(), Obj.make(CronConfig, { name: "pay_creator", singleton: true, msOffset: 550 }))
+  appCron.register("*/10 * * * * *", async () => userHandler.sendBirthday(), Obj.make(CronConfig, { name: "send_birthday", singleton: true }))
 
   return null
 }
