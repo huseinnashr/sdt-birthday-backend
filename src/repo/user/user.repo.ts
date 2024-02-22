@@ -100,10 +100,11 @@ export class UserRepository {
         WHERE 
           now() - ((to_char(now(), 'YYYY') || '-' || to_char(birthday, 'MM-DD'))::timestamp - interval '1 hour' * gmt_offset) at time zone 'utc' between interval '9 hour' and interval '24 hour'
           and (last_send is null or now() - last_send > interval '48 hour')
-          and (last_run is null or now() - last_run > interval '10 minute')	
+          and (last_run is null or now() - last_run > interval '10 second')	
           and id > ?
         ORDER BY id ASC 
         LIMIT ?
+        FOR UPDATE
       )
       returning 
         id,
@@ -123,7 +124,7 @@ export class UserRepository {
 
   async sendBirthday(email: string, fullname: string): PromiseSafe<SendEmailRes> {
     const req: SendEmailReq = { email, message: `Hey, ${fullname} it's your birthday` }
-    const resDo = await this.httpClient.doJSON("send-email", "post", req, SendEmailRes)
+    const resDo = await this.httpClient.doJSON("/send-email", "post", req, SendEmailRes)
     if (resDo instanceof AppError) {
       return new AppError("Failed to send email", resDo)
     }

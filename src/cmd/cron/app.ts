@@ -36,7 +36,9 @@ export async function runApp(cfg: Config, logger: Logger): PromiseSafeVoid {
   const userHandler = new UserHandler(itemUc)
 
   const appCron = new AppCron(logger)
-  appCron.register("*/10 * * * * *", async () => userHandler.sendBirthday(), Obj.make(CronConfig, { name: "send_birthday", singleton: true }))
+  appCron.register("*/15 * * * * *", async () => userHandler.sendBirthday(), Obj.make(CronConfig, { name: "send_birthday", singleton: true }))
+  // simulate concurrency, in reality we'll be doing multiple deployment insteead of registering duplicates cron within the same service
+  appCron.register("*/15 * * * * *", async () => userHandler.sendBirthday(), Obj.make(CronConfig, { name: "send_birthday_2", singleton: true }))
 
   return null
 }

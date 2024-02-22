@@ -10,7 +10,7 @@ export class HttpClient {
 
   async doJSON<T>(endpoint: string, method: HttpMethod, body: any, cls: ClassConstructor<T>): PromiseSafe<T> {
     const url = this.baseUrl + endpoint
-    const req: RequestInit = { method }
+    const req: RequestInit = { method, headers: {"Content-Type": "application/json"} }
 
     if (body != null) {
       req.body = JSON.stringify(body)
